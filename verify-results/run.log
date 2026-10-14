@@ -1,0 +1,19 @@
+=== step 2: environment ===
+PATH shim nvidia-smi: /data3/zsy/bin/nvidia-smi
+index, name, driver_version, memory.total [MiB]
+0, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+1, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+NOTE: flashinfer 0.7.1 + deps installed from the cached wheels of task
+      smoke-3090-trtllm-20261014 (identical artefacts, no re-download),
+      into the isolated dir $BASE/fienv. Shared venv untouched.
+cuda_available: True
+capability: (8, 6)
+device: NVIDIA GeForce RTX 3090
+flashinfer: 0.7.1
+trtllm decode: IMPORT OK
+trtllm prefill: IMPORT OK
+decode trtllm-gen: RUNTIME FAILED RuntimeError: Error in function 'TllmGenFmhaRunner' at /data3/zsy/opensource/verify/smoke-3090-trtllm-v2/fienv/flashinfer/data/include/flashinfer/trtllm/fmha/fmhaRunner.cuh:37: Unsupported architecture
+decode xqa: RUNTIME FAILED RuntimeError: XQA is only supported on SM90, SM100, SM120/SM121 GPUs
+decode auto: RUNTIME FAILED RuntimeError: XQA is only supported on SM90, SM100, SM120/SM121 GPUs
+prefill trtllm-gen: RUNTIME FAILED RuntimeError: Error in function 'TllmGenFmhaRunner' at /data3/zsy/opensource/verify/smoke-3090-trtllm-v2/fienv/flashinfer/data/include/flashinfer/trtllm/fmha/fmhaRunner.cuh:37: Unsupported architecture
+prefill auto: RUNTIME FAILED ValueError: trtllm_batch_context_with_kv_cache backend must be 'trtllm-gen' or 'cake'
