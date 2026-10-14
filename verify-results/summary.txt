@@ -1,4 +1,5 @@
 VERIFY_RESULT: PASS
+OPERATOR NOTE: PASS is per TASK.md's IMPORT-only success criterion. RUNTIME execution on SM86 FAILS for both TRTLLM backends - see EXECUTION TEST section below.
 === nvidia-smi ===
 Failed to initialize NVML: Driver/library version mismatch
 NVML library version: 580.178
@@ -61,3 +62,32 @@ flashinfer: 0.7.1
 trtllm decode: IMPORT OK
 trtllm prefill: IMPORT OK
 === END FOLLOW-UP RERUN ===
+
+=== EXECUTION TEST (operator-added; NOT part of TASK.md commands) ===
+purpose: TASK.md background asks whether SM86 can import AND RUN the TRTLLM kernels.
+         The success criterion only covers IMPORT, so this section answers the RUN half.
+setup  : CUDA_VISIBLE_DEVICES=0, torch 2.10.0+cu128, flashinfer 0.7.1, bf16 KV
+         batch=4  q_heads=32  kv_heads=8  head_dim=128  page_size=64  seq_len=128
+         workspace=256MB int8; JIT host compiler g++-9 via NVCC_PREPEND_FLAGS=-ccbin
+
+--- decode: flashinfer.decode.trtllm_batch_decode_with_kv_cache ---
+backend=trtllm-gen : RuntimeError: Unsupported architecture
+                     at flashinfer/data/include/flashinfer/trtllm/fmha/fmhaRunner.cuh:37
+                     gate: FLASHINFER_CHECK(mSM == kSM_100 || mSM == kSM_103 || mSM == kSM_107, ...)
+backend=xqa        : RuntimeError: XQA is only supported on SM90, SM100, SM120/SM121 GPUs
+                     at flashinfer/xqa.py:402 - gate: cc_major in [9, 10, 12]
+backend=auto       : selects xqa on SM86 -> same RuntimeError as xqa
+
+--- prefill: flashinfer.prefill.trtllm_batch_context_with_kv_cache ---
+backend=trtllm-gen : RuntimeError: Unsupported architecture (same fmhaRunner.cuh:37 gate)
+backend=auto       : ValueError: backend must be 'trtllm-gen' or 'cake'
+
+note: the fmha_gen JIT module COMPILED AND LINKED successfully for -gencode=arch=compute_86,code=sm_86
+      (needed g++-9 as host compiler and a c++ driver shim). The blocker is not the build -
+      it is the device-side architecture gate in the kernel constructor.
+
+CONCLUSION (RUN): RTX 3090 / SM86 CANNOT execute flashinfer's TRTLLM MHA kernels.
+      Both trtllm-gen (SM100/103/107 only) and xqa (SM90/100/120-121 only) hard-reject SM86.
+      AUTO does not fall back to a working TRTLLM path - it selects xqa and raises.
+      Import success (the PASS above) therefore does NOT imply the feature is usable on 3090.
+=== END EXECUTION TEST ===
