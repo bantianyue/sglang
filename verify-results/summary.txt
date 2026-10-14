@@ -1,5 +1,5 @@
-VERIFY_RESULT: PASS
-OPERATOR NOTE: PASS is per TASK.md's IMPORT-only success criterion. RUNTIME execution on SM86 FAILS for both TRTLLM backends - see EXECUTION TEST section below.
+VERIFY_RESULT: FAIL
+reason: import_ok=1 runtime_ok=0 - SM86 cannot execute the TRTLLM kernels (trtllm-gen rejected at fmhaRunner.cuh:37, xqa at xqa.py:402). Re-evaluated under the corrected criterion committed to the task repo as 6fbd21e.
 === nvidia-smi ===
 Failed to initialize NVML: Driver/library version mismatch
 NVML library version: 580.178
