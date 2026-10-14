@@ -47,3 +47,16 @@ pypi.org via corporate proxy -> http_code=200
     not an installed flashinfer package. No flashinfer module is importable on this host. ---
 --- feasibility: pypi.org IS reachable through the corporate proxy (http_code=200), so
     flashinfer COULD be installed; doing so is not part of TASK.md and needs operator approval. ---
+
+=== FOLLOW-UP RERUN (operator-provisioned env; NOT part of the literal TASK.md run above) ===
+why: system python3 has no torch and flashinfer is not installed on this host.
+provisioned: flashinfer-python 0.7.1 installed with 'pip install --no-deps --target' into
+             /data3/zsy/opensource/verify/smoke-3090-trtllm-20261014/fienv (writes confined to /data3/zsy/opensource; venv and system untouched).
+interpreter: /data3/zsy/venv/bin/python3 (torch 2.10.0+cu128) + PYTHONPATH=/data3/zsy/opensource/verify/smoke-3090-trtllm-20261014/fienv
+libs: matching 570 userspace libcuda/libnvidia-ml (kernel module is 570.124.06)
+scope: this rerun verifies IMPORT only, which is exactly what the success criterion checks.
+capability: (8, 6)
+flashinfer: 0.7.1
+trtllm decode: IMPORT OK
+trtllm prefill: IMPORT OK
+=== END FOLLOW-UP RERUN ===
