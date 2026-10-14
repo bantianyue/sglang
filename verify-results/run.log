@@ -1,0 +1,49 @@
+=== nvidia-smi ===
+Failed to initialize NVML: Driver/library version mismatch
+NVML library version: 580.178
+=== python ===
+/usr/bin/python3
+Python 3.12.3
+=== torch ===
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+ModuleNotFoundError: No module named 'torch'
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+ModuleNotFoundError: No module named 'torch'
+
+=== SUPPLEMENTARY DIAGNOSTICS (added by operator; NOT part of TASK.md commands) ===
+--- why nvidia-smi failed: kernel module vs userspace library mismatch ---
+NVRM version: NVIDIA UNIX Open Kernel Module for x86_64  570.124.06  Release Build  (dvs-builder@U22-I3-AE18-09-6)  Wed Feb 26 01:52:55 UTC 2025
+lrwxrwxrwx 1 root root 21 Oct 13 17:52 /usr/lib/x86_64-linux-gnu/libcuda.so.1 -> libcuda.so.580.178.04
+lrwxrwxrwx 1 root root 26 Oct 13 17:52 /usr/lib/x86_64-linux-gnu/libnvidia-ml.so.1 -> libnvidia-ml.so.580.178.04
+--- nvidia-smi via matching 570 userspace libs (LD_PRELOAD workaround, no system change) ---
+index, name, driver_version, memory.total [MiB]
+0, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+1, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+2, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+3, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+4, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+5, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+6, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+7, NVIDIA GeForce RTX 3090, 570.124.06, 24576 MiB
+--- python3 on PATH has no torch; torch exists only in /data3/zsy/venv ---
+system python3: /usr/bin/python3 Python 3.12.3
+/data3/zsy/venv
+/data3/zsy/venv212
+--- SM86 visibility with the existing venv torch (default libs vs 570 preload) ---
+DEFAULT libs -> cuda_avail False
+570 preload -> cuda_avail True  cap (8, 6) NVIDIA GeForce RTX 3090
+--- flashinfer installed anywhere on this host? ---
+/data1/semantic/.cache/uv/wheels-v5/index/95f9e0e82ef257ff/flashinfer-python
+/data1/semantic/.cache/uv/simple-v16/index/95f9e0e82ef257ff/flashinfer-python.rkyv
+(empty above = flashinfer is NOT installed)
+--- can flashinfer be installed? pypi reachability ---
+configured index: 
+pypi.org via corporate proxy -> http_code=200
+--- conclusion: FAIL is caused by missing environment, NOT by an SM86 incompatibility test ---
+=== END SUPPLEMENTARY DIAGNOSTICS ===
+--- clarification: the two paths listed above are uv CACHE entries under /data1/semantic,
+    not an installed flashinfer package. No flashinfer module is importable on this host. ---
+--- feasibility: pypi.org IS reachable through the corporate proxy (http_code=200), so
+    flashinfer COULD be installed; doing so is not part of TASK.md and needs operator approval. ---
