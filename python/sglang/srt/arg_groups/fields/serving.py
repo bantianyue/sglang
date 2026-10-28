@@ -68,6 +68,10 @@ class Serving(msgspec.Struct):
         str,
         "App is behind a path based routing proxy.",
     ] = ""
+    enable_http_worker_reuseport: A[
+        bool,
+        "Give each Uvicorn HTTP worker its own SO_REUSEPORT listener.",
+    ] = False
     smg_grpc_mode: A[
         bool,
         "Use the legacy SMG gRPC server (smg-grpc-servicer) instead of the HTTP "
@@ -126,6 +130,14 @@ class Serving(msgspec.Struct):
         "Initial connection-level HTTP/2 receive window in bytes (1024 to "
         "2^31 - 1). Only applies with --enable-http2.",
     ] = 1024 * 1024
+    max_payload_size: A[
+        int,
+        "Maximum size of an incoming HTTP request payload in bytes. Requests "
+        "exceeding this limit will be rejected with a 413 (Request Entity Too "
+        "Large). Applies to both Uvicorn and Granian (HTTP/1.1 and HTTP/2) "
+        "backends. Increase this to accept large JSON bodies such as base64-"
+        "encoded multimodal inputs. Default is 10 MB.",
+    ] = 10 * 1024 * 1024
 
     # -------------------------------------------------------------------------
     # SSL/TLS

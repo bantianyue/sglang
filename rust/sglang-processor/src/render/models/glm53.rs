@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use dynamo_renderer::{OAIChatLikeRequest, PromptFormatter};
 use serde_json::{Value, json};
 
-use super::deepseek_v4::{engine_message, normalize_tools, split_continuation};
+use super::pydantic_dump::{engine_message, normalize_tools, split_continuation};
 use crate::render::reasoning::{requested_effort, requested_thinking};
 
 /// `apply_chat_template` arguments SGLang passes itself: as kwargs they fail the
@@ -232,7 +232,7 @@ fn join_text_parts(message: &mut Value) {
 
 /// `render_jinja_template`: Python iterates `documents` and requires each item
 /// to be a dict, so only an empty string or object passes besides a list of objects.
-fn valid_documents(documents: &Value) -> bool {
+pub(super) fn valid_documents(documents: &Value) -> bool {
     match documents {
         Value::Null => true,
         Value::Array(items) => items.iter().all(Value::is_object),
